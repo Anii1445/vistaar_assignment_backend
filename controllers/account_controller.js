@@ -18,6 +18,11 @@ const getAllDistinctProduct = async (req, res) => {
 
 const transactionBelow5000 = async (req, res) => {
   try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    console.log(page);
+    const skip = (page - 1) * limit;
+
     const response = await Transaction.find(
       {
         "transactions.amount": { $lt: 5000 },
@@ -27,13 +32,24 @@ const transactionBelow5000 = async (req, res) => {
         transactions: { $elemMatch: { amount: { $lt: 5000 } } },
         _id: 0,
       },
-    );
+    )
+      .skip(skip)
+      .limit(limit);
+
+    const total = await Transaction.countDocuments({
+      "transactions.amount": { $lt: 5000 },
+    });
 
     if (!response || response.length === 0) {
       return res.status(404).json({ msg: "No data found" });
-    } else {
-      res.status(200).json(response);
     }
+
+    res.status(200).json({
+      response,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+    });
   } catch (error) {
     res.status(400).json({ msg: "Internal server error", error });
     console.log(error);
