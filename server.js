@@ -6,7 +6,7 @@ require("dotenv").config();
 const router = require("./router");
 
 const corsOptions = {
-  origin: ["http://localhost:5173","https://vistaar-assignment-frontend.vercel.app/"],
+  origin: ["http://localhost:5173","https://vistaar-assignment-frontend.vercel.app"],
   methods: "GET, POST, DELETE, PUT, PATCH, HEAD",
   credentials: true,
 };
